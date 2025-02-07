@@ -22,7 +22,7 @@ func NewLeastBusyWorker(id int, wg *sync.WaitGroup) *LeastBusyWorker {
 	}
 }
 
-func (w *LeastBusyWorker) Start() {
+func (w *LeastBusyWorker) start() {
 	for task := range w.taskQueue {
 		w.mutex.Lock()
 		w.active++
@@ -53,7 +53,7 @@ func NewBusyWorkerPool(workers int) *BusyWorkerPool {
 	for i := 0; i < workers; i++ {
 		worker := NewLeastBusyWorker(i, wp.wg)
 		wp.workers = append(wp.workers, worker)
-		go worker.Start()
+		go worker.start()
 	}
 	return wp
 }

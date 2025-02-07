@@ -19,22 +19,20 @@ func main() {
 		tasks.NewCalculateTask(123, 0),
 	}
 
-	//workerCount := 2
-	//wp := workers.NewWorkerPool(workerCount)
-	//
-	//for _, task := range tasksQuery {
-	//	wp.AddTask(task)
-	//}
-	//
-	//signalChan := make(chan os.Signal, 1)
-	//signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-	//
-	//<-signalChan
-	//log.Println("Graceful shutdown initiated...")
-	//wp.Shutdown()
-
 	workerCount := 2
-	wp := workers.NewBusyWorkerPool(workerCount)
+	workerType := 1
+
+	var wp workers.WorkerPool
+
+	if workerType == 1 {
+		wp = workers.NewBusyWorkerPool(workerCount)
+	} else if workerType == 2 {
+		wp = workers.NewCircleWorkerPool(workerCount)
+	}
+
+	for _, task := range tasksQuery {
+		wp.AddTask(task)
+	}
 
 	for _, task := range tasksQuery {
 		wp.AddTask(task)
