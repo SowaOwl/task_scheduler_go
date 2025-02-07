@@ -16,7 +16,7 @@ func main() {
 		tasks.NewCalculateTask(10, 2),
 		tasks.NewHttpTask("https://testscheduler.free.beeceptor.com/test", ""),
 		tasks.NewFileTask("new_file.txt", "New Test Data"),
-		tasks.NewCalculateTask(123, 0),
+		tasks.NewCalculateTask(100, 5),
 	}
 
 	workerCount := 2
