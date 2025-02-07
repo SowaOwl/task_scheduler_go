@@ -28,6 +28,8 @@ func main() {
 		wp = workers.NewBusyWorkerPool(workerCount)
 	} else if workerType == 2 {
 		wp = workers.NewCircleWorkerPool(workerCount)
+	} else {
+		panic("Invalid worker type")
 	}
 
 	for _, task := range tasksQuery {
