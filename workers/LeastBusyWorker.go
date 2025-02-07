@@ -40,3 +40,41 @@ func (w *LeastBusyWorker) Start() {
 		w.wg.Done()
 	}
 }
+
+type BusyWorkerPool struct {
+	workers []*LeastBusyWorker
+	wg      *sync.WaitGroup
+}
+
+func NewBusyWorkerPool(workers int) *BusyWorkerPool {
+	wp := &BusyWorkerPool{
+		wg: &sync.WaitGroup{},
+	}
+	for i := 0; i < workers; i++ {
+		worker := NewLeastBusyWorker(i, wp.wg)
+		wp.workers = append(wp.workers, worker)
+		go worker.Start()
+	}
+	return wp
+}
+
+func (wp *BusyWorkerPool) AddTask(task tasks.Task) {
+	leastBusyWorker := wp.workers[0]
+	for _, worker := range wp.workers {
+		worker.mutex.Lock()
+		if worker.active < leastBusyWorker.active {
+			leastBusyWorker = worker
+		}
+		worker.mutex.Unlock()
+	}
+
+	wp.wg.Add(1)
+	leastBusyWorker.taskQueue <- task
+}
+
+func (wp *BusyWorkerPool) Shutdown() {
+	wp.wg.Wait()
+	for _, worker := range wp.workers {
+		close(worker.taskQueue)
+	}
+}
